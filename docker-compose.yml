@@ -1,0 +1,23 @@
+version: '2'
+services:
+ mysql:
+  image: mysql
+  ports:
+   - "3306:3306"
+  container_name: mysql
+  network_mode: host
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_DATABASE: Keepnote
+ spring-demo:
+    image: movie-new-mysql
+    build: movie-service sql/
+    restart: always
+    network_mode: host
+    container_name: docker_spring
+    depends_on: 
+      - mysql
+    ports:
+      - "8080:8080"
+    expose: 
+      - 8080
