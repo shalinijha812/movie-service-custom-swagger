@@ -1,0 +1,28 @@
+CREATE (pl:Source{id:'source1',name:'ProgrammingLanguage'}),(C:Language{id:'language1',name:'C'}),(Java:Language{id:'language2', name:'Java'}),(Python:Language{id:'language3', name:'python'})
+
+MATCH (C:Language),(pl:Source)
+WHERE pl.name = "ProgrammingLanguage" AND C.name = "C"
+CREATE (C)-[r:isA{id:'relation1',name:'isA'}]->(pl)
+RETURN type(r)
+
+MATCH (Java:Language),(pl:Source)
+WHERE pl.name = "ProgrammingLanguage" AND Java.name = "Java"
+CREATE (Java)-[r:isA{id:'relation2',name:'isA'}]->(pl)
+
+
+MATCH (Python:Language),(pl:Source)
+WHERE pl.name = "ProgrammingLanguage" AND Python.name = "python"
+CREATE (Python)-[r:isA{id:'relation3',name:'isA'}]->(pl)
+
+LOAD CSV WITH HEADERS FROM "file:///home/cgi/Documents/javaConcepts1.csv" AS row 
+CREATE(n:Concept{nodeid:row.node_id,name:row.name,parentnodeid:row.parent_node_id})
+
+LOAD CSV WITH HEADERS FROM "file:///home/cgi/Documents/javaConcepts1.csv" AS row 
+MATCH(c:Concept{nodeid:row.node_id}),(p:Concept{nodeid:row.parent_node_id})	
+CREATE (c)-[r:isSubPartOf{id:'relation4',name:row.parent_relation}]->(p)
+
+LOAD CSV WITH HEADERS FROM "file:///home/cgi/Documents/javaConcepts1.csv" AS row 
+MATCH(c:Concept{nodeid:row.parent_node_id}),(p:Language),(other:Concept{nodeid:row.node_id})
+WHERE NOT (c)-[:isSubPartOf{id:'relation4',name:row.parent_relation}]->(other) AND p.name='Java'
+CREATE(c)-[r:isPartOf{id:'relation4',name:'isPartOf'}]->(p) 
+RETURN r;
